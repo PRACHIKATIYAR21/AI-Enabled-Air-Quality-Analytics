@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Enabled Unified Real-Time Air Quality Analytics</title>
+  <meta name="description" content="Smart Environmental Monitoring & Analytics dashboard" />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Our styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <div class="layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-wind"></i></div>
+        <div>
+          <div class="brand-title">AQ Analytics</div>
+          <div class="brand-sub">Environmental Monitor</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="#overview" class="nav-link active"><i class="fa-solid fa-gauge-high"></i> Overview</a>
+        <a href="#sensors" class="nav-link"><i class="fa-solid fa-microchip"></i> Sensors</a>
+        <a href="#alerts" class="nav-link"><i class="fa-solid fa-triangle-exclamation"></i> Alerts</a>
+        <a href="#analytics" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+        <a href="#readings" class="nav-link"><i class="fa-solid fa-table-list"></i> Readings</a>
+        <a href="#legend" class="nav-link"><i class="fa-solid fa-palette"></i> Legend</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-title"><i class="fa-solid fa-brain"></i> Model</div>
+        <p>Decision Tree</p>
+        <small>Primary feature: PM2.5</small>
+      </div>
+
+      <div class="sidebar-footer">
+        <small>Project: Third Year AI/ML</small>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main">
+
+      <!-- Mobile top bar -->
+      <div class="mobile-topbar">
+        <button class="icon-btn" id="menuToggle" aria-label="Toggle menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="mobile-title">AQ Analytics</span>
+        <button class="icon-btn" id="mobileRefresh" aria-label="Refresh">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+      </div>
+
+      <!-- Connection / demo banner -->
+      <div class="banner hidden" id="statusBanner" role="status">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="bannerText"></span>
+      </div>
+
+      <!-- ============ HEADER ============ -->
+      <header class="header glass" id="overview">
+        <div class="header-left">
+          <h1 class="project-title">AI Enabled Unified Real-Time Air Quality Analytics</h1>
+          <p class="subtitle">Smart Environmental Monitoring &amp; Analytics</p>
+          <div class="header-meta">
+            <span class="system-status" id="systemStatus">
+              <span class="pulse-dot" id="statusDot"></span>
+              <span id="statusText">Connecting...</span>
+            </span>
+            <span class="meta-item">
+              <i class="fa-regular fa-clock"></i>
+              Last updated: <strong id="lastUpdated">--</strong>
+            </span>
+            <span class="meta-item">
+              <i class="fa-solid fa-rotate"></i>
+              Next refresh in <strong id="nextRefresh">60</strong>s
+            </span>
+          </div>
+        </div>
+        <div class="header-right">
+          <span class="demo-badge" id="demoBadge"><i class="fa-solid fa-flask"></i> DEMO DATA</span>
+          <button class="btn-primary" id="refreshBtn">
+            <i class="fa-solid fa-rotate"></i> Refresh
+          </button>
+        </div>
+      </header>
+
+      <!-- ============ STATUS + ALERTS ============ -->
+      <section class="grid-2">
+        <!-- Air quality status -->
+        <article class="glass status-card" id="statusCard" data-level="unknown">
+          <div class="status-top">
+            <span class="section-label"><i class="fa-solid fa-leaf"></i> Air Quality Status</span>
+            <span class="demo-tag">Sample prediction</span>
+          </div>
+
+          <div class="status-main">
+            <div class="status-emoji" id="statusEmoji">⚪</div>
+            <div>
+              <div class="status-label" id="statusLabel">--</div>
+              <div class="status-sub">Predicted air quality category</div>
+            </div>
+          </div>
+
+          <div class="status-stats">
+            <div class="stat-box">
+              <span class="stat-label">Predicted Category</span>
+              <span class="stat-value" id="predictedValue">--</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Estimated AQI</span>
+              <span class="stat-value" id="aqiValue">N/A</span>
+              <span class="stat-hint">Shown only when provided by backend</span>
+            </div>
+          </div>
+
+          <p class="status-explanation" id="statusExplanation">Waiting for data...</p>
+        </article>
+
+        <!-- Attention panel -->
+        <article class="glass alert-panel" id="alerts">
+          <div class="alert-header">
+            <span class="section-label"><i class="fa-solid fa-triangle-exclamation"></i> Attention Required</span>
+            <span class="count-badge" id="alertCount">0</span>
+          </div>
+          <h3 class="alert-title">⚠️ Air quality needs attention</h3>
+          <ul class="alert-list" id="alertList"></ul>
+          <div class="suggested-action">
+            <i class="fa-solid fa-lightbulb"></i>
+            <div>
+              <strong>Suggested action</strong>
+              <p id="suggestedAction">Loading recommendations...</p>
+            </div>
+          </div>
+          <p class="model-note">
+            <i class="fa-solid fa-circle-info"></i>
+            The Decision Tree model relies primarily on PM2.5. Temperature, humidity and light are shown for context
+            and were not identified as the cause of the prediction.
+          </p>
+        </article>
+      </section>
+
+      <!-- ============ SENSOR CARDS ============ -->
+      <section class="section" id="sensors">
+        <div class="section-head">
+          <h2><i class="fa-solid fa-microchip"></i> Sensor Monitoring</h2>
+          <span class="muted">Live readings from connected sensors</span>
+        </div>
+
+        <div class="sensor-grid">
+          <!-- Temperature -->
+          <article class="glass sensor-card" data-sensor="temperature">
+            <div class="sensor-top">
+              <span class="sensor-icon">🌡️</span>
+              <span class="status-pill neutral" id="status-temperature">Neutral</span>
+            </div>
+            <h4>Temperature</h4>
+            <div class="sensor-reading"><span id="val-temperature">--</span><small>°C</small></div>
+          </article>
+
+          <!-- Humidity -->
+          <article class="glass sensor-card" data-sensor="humidity">
+            <div class="sensor-top">
+              <span class="sensor-icon">💧</span>
+              <span class="status-pill neutral" id="status-humidity">Neutral</span>
+            </div>
+            <h4>Humidity</h4>
+            <div class="sensor-reading"><span id="val-humidity">--</span><small>%</small></div>
+          </article>
+
+          <!-- Light -->
+          <article class="glass sensor-card" data-sensor="light">
+            <div class="sensor-top">
+              <span class="sensor-icon">💡</span>
+              <span class="status-pill neutral" id="status-light">Neutral</span>
+            </div>
+            <h4>Light Intensity</h4>
+            <div class="sensor-reading"><span id="val-light">--</span><small>lux</small></div>
+          </article>
+
+          <!-- MQ135 -->
+          <article class="glass sensor-card" data-sensor="mq135">
+            <div class="sensor-top">
+              <span class="sensor-icon">🧪</span>
+              <span class="status-pill neutral" id="status-mq135">Neutral</span>
+            </div>
+            <h4>MQ135 Gas Sensor</h4>
+            <div class="sensor-reading"><span id="val-mq135">--</span><small>raw</small></div>
+          </article>
+
+          <!-- PM2.5 -->
+          <article class="glass sensor-card" data-sensor="pm25">
+            <div class="sensor-top">
+              <span class="sensor-icon">🌫️</span>
+              <span class="status-pill neutral" id="status-pm25">Neutral</span>
+            </div>
+            <h4>PM2.5</h4>
+            <div class="sensor-reading"><span id="val-pm25">--</span><small>µg/m³</small></div>
+          </article>
+
+          <!-- PM10 -->
+          <article class="glass sensor-card" data-sensor="pm10">
+            <div class="sensor-top">
+              <span class="sensor-icon">🌫️</span>
+              <span class="status-pill neutral" id="status-pm10">Neutral</span>
+            </div>
+            <h4>PM10</h4>
+            <div class="sensor-reading"><span id="val-pm10">--</span><small>µg/m³</small></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ ANALYTICS ============ -->
+      <section class="section" id="analytics">
+        <div class="section-head">
+          <h2><i class="fa-solid fa-chart-line"></i> Analytics &amp; Trends</h2>
+          <span class="demo-tag">Sample / demo historical data</span>
+        </div>
+
+        <div class="chart-grid">
+          <article class="glass chart-card">
+            <div class="chart-head">
+              <h4>🌫️ PM2.5 Trend</h4>
+              <span class="muted small">µg/m³</span>
+            </div>
+            <div class="chart-wrap"><canvas id="pm25Chart"></canvas></div>
+          </article>
+
+          <article class="glass chart-card">
+            <div class="chart-head">
+              <h4>🌫️ PM10 Trend</h4>
+              <span class="muted small">µg/m³</span>
+            </div>
+            <div class="chart-wrap"><canvas id="pm10Chart"></canvas></div>
+          </article>
+
+          <article class="glass chart-card">
+            <div class="chart-head">
+              <h4>🌡️ Temperature Trend</h4>
+              <span class="muted small">°C</span>
+            </div>
+            <div class="chart-wrap"><canvas id="temperatureChart"></canvas></div>
+          </article>
+
+          <article class="glass chart-card">
+            <div class="chart-head">
+              <h4>💧 Humidity Trend</h4>
+              <span class="muted small">%</span>
+            </div>
+            <div class="chart-wrap"><canvas id="humidityChart"></canvas></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ READINGS + LEGEND ============ -->
+      <section class="grid-2 section" id="readings">
+        <article class="glass table-card">
+          <div class="section-head">
+            <h2><i class="fa-solid fa-table-list"></i> Recent Readings</h2>
+            <span class="demo-tag">Sample data</span>
+          </div>
+          <div class="table-wrap">
+            <table class="readings-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>🌡️ Temp (°C)</th>
+                  <th>💧 Humidity (%)</th>
+                  <th>🌫️ PM2.5</th>
+                  <th>🌫️ PM10</th>
+                </tr>
+              </thead>
+              <tbody id="readingsBody">
+                <tr><td colspan="5" class="muted center">Loading readings...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="glass legend-card" id="legend">
+          <div class="section-head">
+            <h2><i class="fa-solid fa-palette"></i> Category Legend</h2>
+          </div>
+          <div class="legend-item good">
+            <span class="legend-dot"></span>
+            <div>
+              <strong>🟢 GOOD</strong>
+              <p>Air quality is considered satisfactory for most people.</p>
+            </div>
+          </div>
+          <div class="legend-item moderate">
+            <span class="legend-dot"></span>
+            <div>
+              <strong>🟡 MODERATE</strong>
+              <p>Acceptable overall; sensitive individuals may want to monitor readings.</p>
+            </div>
+          </div>
+          <div class="legend-item bad">
+            <span class="legend-dot"></span>
+            <div>
+              <strong>🔴 BAD</strong>
+              <p>Air quality may affect health; review readings and consider reducing exposure.</p>
+            </div>
+          </div>
+          <p class="muted small legend-note">
+            Category descriptions are generic placeholders. Use official, project-approved guidance before final reporting.
+          </p>
+        </article>
+      </section>
+
+      <!-- ============ FOOTER ============ -->
+      <footer class="footer">
+        <span>AI Enabled Unified Real-Time Air Quality Analytics · Demo Build</span>
+        <span id="footerTime">--</span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Our logic -->
+  <script src="script.js"></script>
+</body>
+</html>
